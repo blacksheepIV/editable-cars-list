@@ -1,0 +1,19 @@
+.color__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+.color__sample {
+  width: 15px;
+  height: 15px;
+  margin-left: 5px;
+  border-radius: 50%;
+  border: 1px #000 solid;
+}
+
+.color__text {
+  text-align: left;
+  width: 50px;
+}
