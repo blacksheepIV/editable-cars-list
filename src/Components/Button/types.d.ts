@@ -5,7 +5,7 @@ export interface ButtonProps
   children: React.ReactNode;
   icon?: React.ReactNode;
   type?: "button" | "submit" | "reset";
-  layout?: "primary" | "transparent";
+  layout?: "primary" | "transparent" | "warning";
   tooltip?: string;
   loading?: boolean;
 }

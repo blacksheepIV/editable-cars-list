@@ -1,21 +1,26 @@
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import DataTable, { TableColumn } from "react-data-table-component";
+import Modal from "react-modal";
+import { ListContext } from "../../context/ListContext";
 
-import Button from "../Button/index";
+import Button from "../Button";
+import Form from "../Form";
+
 import "./CarList.css";
+
 import type { CarsInfo, DataRow } from "../../types/types";
 
 const baseURL = process.env.REACT_APP_API_URL;
 
 const CarList: FC = () => {
-  const [data, setData] = useState<CarsInfo[]>([]);
   const [error, setError] = useState<boolean>(false);
+  const { list, setList, setCurrentProduct } = useContext(ListContext);
 
   async function getCarsInfo(): Promise<void> {
     try {
       let res = await axios.get<CarsInfo[]>(`${baseURL}cars`);
-      setData(res.data);
+      setList(res.data);
     } catch (error) {
       setError(true);
       console.error(error);
@@ -23,13 +28,20 @@ const CarList: FC = () => {
   }
 
   useEffect(() => {
-    getCarsInfo();
-  }, []);
+    if (list && list.length === 0) {
+      console.log("bello", list);
+      getCarsInfo();
+    }
+  }, [list, setList]);
 
   const columns: TableColumn<DataRow>[] = [
     {
+      name: "ID",
+      selector: (row) => row.ID
+    },
+    {
       name: "CARID",
-
+      id: "CARID",
       selector: (row) => row.CARID
     },
     {
@@ -64,10 +76,18 @@ const CarList: FC = () => {
       name: "Edit",
 
       selector: (row) => row.EDIT,
-      format: () => <Button size="small">Edit</Button>
+      format: (row) => (
+        <Button size="small" onClick={() => editProduct(row)}>
+          Edit
+        </Button>
+      )
     }
   ];
 
+  function editProduct(product: CarsInfo) {
+    setCurrentProduct(product);
+    setIsOpen(true);
+  }
   const customStyles = {
     headRow: {
       style: {
@@ -91,17 +111,30 @@ const CarList: FC = () => {
     }
   };
 
+  const [modalIsOpen, setIsOpen] = useState<boolean>(false);
+
+  function closeModal() {
+    setIsOpen(false);
+  }
   return (
-    <DataTable
-      columns={columns}
-      data={data}
-      fixedHeader={true}
-      striped={true}
-      highlightOnHover={true}
-      pagination={true}
-      paginationPerPage={10}
-      customStyles={customStyles}
-    />
+    <>
+      {!error && (
+        <>
+          <DataTable
+            columns={columns}
+            data={list}
+            striped={true}
+            highlightOnHover={true}
+            pagination={true}
+            paginationPerPage={10}
+            customStyles={customStyles}
+          />
+          <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
+            <Form closeForm={closeModal} />
+          </Modal>
+        </>
+      )}
+    </>
   );
 };
 

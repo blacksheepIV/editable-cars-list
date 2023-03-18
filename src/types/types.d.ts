@@ -1,4 +1,5 @@
 export interface CarsInfo {
+  ID: number;
   CARID: string;
   INSTOCK: boolean;
   HP: number;
